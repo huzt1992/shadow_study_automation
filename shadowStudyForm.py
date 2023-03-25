@@ -17,6 +17,7 @@ class TinkerForm(tk.Tk):
         # data
         self.shadow_multiply_ratio = 0.7
         self.roof_lighter_ratio = 0.5
+        self.width = 0
         site1color = (203, 51, 100)
         site2color = (255, 221, 21)
         site3color = (0, 74, 151)
@@ -50,6 +51,8 @@ class TinkerForm(tk.Tk):
             self.roof_lighter_ratio = float(next(csv_reader)[0])
             # Read color_palette
             self.color_palette = [tuple(map(int, color.strip("()").split(","))) for color in next(csv_reader)]
+            # Read width
+            self.width = float(next(csv_reader)[0])
 
         # Update Graphic
         self.shadow_multiply_ratio_entry.delete(0, tk.END)
@@ -61,9 +64,13 @@ class TinkerForm(tk.Tk):
         self.site_shadow_3_color_button.configure(bg=self.convert_To_Hex(self.color_palette[2]))
         self.site_shadow_4_color_button.configure(bg=self.convert_To_Hex(self.color_palette[3]))
         self.site_shadow_5_color_button.configure(bg=self.convert_To_Hex(self.color_palette[4]))
+        self.shadow_outline_entry.delete(0, tk.END)
+        self.shadow_outline_entry.insert(0, str(self.width))
 
     def on_save_click(self):
-        data = [[self.shadow_multiply_ratio],[self.roof_lighter_ratio],self.color_palette]
+        print(self.width)
+        print(self.shadow_multiply_ratio)
+        data = [[self.shadow_multiply_ratio],[self.roof_lighter_ratio],self.color_palette,[self.width]]
         file_path = filedialog.asksaveasfilename(defaultextension=".csv")
         with open(file_path, "w", newline="") as csvfile:
             # create a CSV writer object
@@ -99,14 +106,41 @@ class TinkerForm(tk.Tk):
         self.advanced_visible = not self.advanced_visible
         self.toggle_advanced_visibility()
 
+    def update_shadow_multiply_ratio(self, event):
+        try:
+            new_value = float(self.shadow_multiply_ratio_entry.get())
+            self.shadow_multiply_ratio = new_value
+            print("Updated shadow_multiply_ratio:", self.shadow_multiply_ratio)
+        except ValueError:
+            print("Invalid input. Please enter a valid float number.")
+
+
+    def update_roof_lighter_ratio(self, event):
+        try:
+            new_value = float(self.roof_lighter_ratio_entry.get())
+            self.roof_lighter_ratio = new_value
+            print("Updated roof_lighter_ratio:", self.roof_lighter_ratio)
+        except ValueError:
+            print("Invalid input. Please enter a valid float number.")
+
+    def update_width(self, event):
+        try:
+            new_value = int(self.shadow_outline_entry.get())
+            self.width = new_value
+            print("Updated shadow outline width:", self.width)
+        except ValueError:
+            print("Invalid input. Please enter a valid float number.")
+
     def create_widgets(self):
         self.shadow_multiply_ratio_label = tk.Label(self, text="Shadow Multiply Ratio", font = self.label_font)
         self.shadow_multiply_ratio_entry = tk.Entry(self)
         self.shadow_multiply_ratio_entry.insert(0, self.shadow_multiply_ratio)
+        self.shadow_multiply_ratio_entry.bind('<Return>', self.update_shadow_multiply_ratio)
 
         self.roof_lighter_ratio_label = tk.Label(self, text="Roof Lighter Ratio", font = self.label_font)
         self.roof_lighter_ratio_entry = tk.Entry(self)
         self.roof_lighter_ratio_entry.insert(0, self.roof_lighter_ratio)
+        self.roof_lighter_ratio_entry.bind('<Return>', self.update_roof_lighter_ratio)
 
         self.site_shadow_1_color_label = tk.Label(self, text="Site Shadow 1 Color", font = self.label_font)
         self.site_shadow_1_color_button = tk.Button(self, text="Choose Color", command=self.on_color_click_1, bg=self.convert_To_Hex(self.color_palette[0]))
@@ -122,6 +156,11 @@ class TinkerForm(tk.Tk):
 
         self.site_shadow_5_color_label = tk.Label(self, text="Site Shadow 5 Color", font= self.label_font)
         self.site_shadow_5_color_button = tk.Button(self, text="Choose Color", command=self.on_color_click_5, bg=self.convert_To_Hex(self.color_palette[4]))
+
+        self.shadow_outline_label = tk.Label(self, text="Shadow Outline", font = self.label_font)
+        self.shadow_outline_entry = tk.Entry(self)
+        self.shadow_outline_entry.insert(0, self.width)
+        self.shadow_outline_entry.bind('<Return>', self.update_width)
 
         self.ok_button = tk.Button(self, text="OK", command=self.on_ok_click, font = self.label_font)
         self.save_button = tk.Button(self,text = "Save Setting",command = self.on_save_click, font = self.label_font)
@@ -160,6 +199,10 @@ class TinkerForm(tk.Tk):
             self.site_shadow_4_color_button.grid(row=8, column=1, padx=5, pady=5, sticky='nsew')
             self.site_shadow_5_color_label.grid(row=9, column=0, padx=5, pady=5, sticky='nsew')
             self.site_shadow_5_color_button.grid(row=9, column=1, padx=5, pady=5, sticky='nsew')
+
+            self.shadow_outline_label.grid(row=10, column=0, padx=5, pady=5, sticky='nsew')
+            self.shadow_outline_entry.grid(row=10, column=1, padx=5, pady=5, sticky='nsew')
+            self.shadow_outline_entry.grid(row=10, column=1, padx=5, pady=5, sticky='nsew')
         else:
             self.shadow_multiply_ratio_label.grid_forget()
             self.shadow_multiply_ratio_entry.grid_forget()
@@ -175,6 +218,8 @@ class TinkerForm(tk.Tk):
             self.site_shadow_4_color_button.grid_forget()
             self.site_shadow_5_color_label.grid_forget()
             self.site_shadow_5_color_button.grid_forget()
+            self.shadow_outline_label.grid_forget()
+            self.shadow_outline_entry.grid_forget()
 
 if __name__ == "__main__":
     app = TinkerForm()
